@@ -95,7 +95,7 @@ def project(
         # Downsample image to 256x256 if it's larger than that. VGG was built for 224x224 images.
         synth_images = (synth_images + 1) * (255/2)
         if synth_images.shape[2] > 256:
-            synth_images = F.interpolate(synth_images, size=(256, 256), mode='area')
+            synth_images = F.interpolate(synth_images, size=(256, 256), mode='area', force_fp32=True)
 
         # Features for synth images.
         synth_features = vgg16(synth_images, resize_images=False, return_lpips=True)
@@ -160,7 +160,7 @@ def run_projection(
 
     # Load networks.
     print('Loading networks from "%s"...' % network_pkl)
-    device = torch.device('cuda')
+    device = torch.device('cpu')
     with dnnlib.util.open_url(network_pkl) as fp:
         G = legacy.load_network_pkl(fp)['G_ema'].requires_grad_(False).to(device) # type: ignore
 
